@@ -38,7 +38,7 @@ class MODEL_JPG_VECTOR(object):
         folder_path = self.folder_path
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
-        img_path_many = movies_jpgs[100:103 ]
+        img_path_many = movies_jpgs[1000:1003 ]
         print(img_path_many)
         return img_path_many
 
@@ -77,7 +77,7 @@ class MODEL_JPG_VECTOR(object):
 
             name_index = 0
 
-            temp_zero_array = np.ones([temp_chunk, 299, 299, 3], dtype=np.float32)
+            temp_zero_array = np.zeros([temp_chunk, 299, 299, 3], dtype=np.float32)
             for index, img_path in enumerate(img_path_many[start_of_slice:end_of_slice]):
 
                 self.b1_img_path = img_path
