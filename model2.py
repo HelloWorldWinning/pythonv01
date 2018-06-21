@@ -42,9 +42,9 @@ class MODEL_JPG_VECTOR(object):
         folder_path = self.folder_path
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
-        img_path_many = movies_jpgs[100 * 100]
-        print([img_path_many])
-        return [img_path_many]
+        img_path_many = movies_jpgs[100100:100100+5]
+        # print([img_path_many])
+        return img_path_many
 
     def Jpg_To_Vector(self, img_path):
 
@@ -145,7 +145,7 @@ class MODEL_JPG_VECTOR(object):
 
 
 bar = MODEL_JPG_VECTOR(folder_path=folder_path)
-one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-1])
+one_jpg = bar.Jpg_To_Vector_DataBase(bar.img_path_many[-1])
 one_jpg
 ten_jpg = bar.Jpg_To_Vector_DataBase()
 ten_jpg

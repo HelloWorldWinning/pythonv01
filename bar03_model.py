@@ -38,7 +38,7 @@ class MODEL_JPG_VECTOR(object):
         folder_path = self.folder_path
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
-        img_path_many = movies_jpgs[1000:1004 ]
+        img_path_many = movies_jpgs[1000:1004]
         print(img_path_many)
         return img_path_many
 
@@ -52,8 +52,8 @@ class MODEL_JPG_VECTOR(object):
         self.a_2 = x
         x = self._preprocess_input(x)
         self.a_3 = x
-        output_of_model = self._model.predict(np.vstack([x,x]), batch_size=32 * 5)
-        self.a6_data = output_of_model[-1].reshape(1, -1)
+        output_of_model = self._model.predict(x, batch_size=32 * 5)
+        self.a6_data = output_of_model.reshape(1, -1)
         return self.a6_data
 
     def Jpg_To_Vector_DataBase(self):
@@ -76,8 +76,8 @@ class MODEL_JPG_VECTOR(object):
                 temp_chunk = chunk
 
             name_index = 0
-
-            temp_zero_array = np.zeros([temp_chunk, 299, 299, 3], dtype=np.float32)
+            # temp_zero_array = np.zeros([temp_chunk, 299, 299, 3], dtype=np.float32)
+            temp_list = []
             for index, img_path in enumerate(img_path_many[start_of_slice:end_of_slice]):
 
                 self.b1_img_path = img_path
@@ -87,23 +87,15 @@ class MODEL_JPG_VECTOR(object):
                 x = self._image.img_to_array(img)
                 self.b_1 = x
                 # self.b2_x_array = x
-                x = np.expand_dims(x, axis=0)
+                # x = np.expand_dims(x, axis=0)
                 self.b_2 = x
-                # self.b3_x_expand = x
-
-                temp_zero_array[index] = x
-
-                print("name_index =", name_index, "temp_chunk =", temp_chunk, "temp_zero_array.shape =",
-                      temp_zero_array.shape)
-                name_index += 1
-
-            # self.b3_x_expand_temp_zero_array = temp_zero_array
-            x = self._preprocess_input(temp_zero_array)
-
-            self.b_3 = x
+                # self.b3_x_expand_temp_zero_array = temp_zero_array
+                x = self._preprocess_input(x)
+                temp_list.append(x)
+            self.b_3 = temp_list
             # self.b4_preprocessed = x
 
-            output_of_model = self._model.predict(x, batch_size=32 * 5)
+            output_of_model = self._model.predict(np.array(temp_list), batch_size=32 * 5)
             self.b_last_output = output_of_model
             # self.b5_output = output_of_model
             data = output_of_model.reshape(temp_chunk, -1)
