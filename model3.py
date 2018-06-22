@@ -3,9 +3,17 @@ import subprocess
 import os
 # np.set_printoptions(precision=20)
 
+from database import DATABASE
+
+bar3 = DATABASE()
+bar3.database_chose("bar3")
+bar3.collection_chose("bar3")
+
 class MODEL_JPG_VECTOR(object):
 
-    def __init__(self, chunk=1500, img_path_many=None, folder_path=None):
+    def __init__(self, chunk=1500, img_path_many=None, folder_path=None,database=bar3):
+        self.database = database
+
         from keras.models import Model
         self._Model = Model
         from keras.preprocessing import image
@@ -115,15 +123,24 @@ class MODEL_JPG_VECTOR(object):
             data = output_of_model.reshape(temp_chunk, -1)
             # self.b6_data = data
             # print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
-            i += 1
-        temp_target = self.target[start_of_slice: end_of_slice]
 
-        if to_database:
-            print("to database")
-            return data ,temp_target
-        else:
-            print("to query")
-            return data ,temp_target
+            i += 1
+
+            temp_target = self.target[start_of_slice: end_of_slice]
+
+            if to_database:
+                # print("to database")
+                # print(data.shape, temp_target)
+                # return data,temp_target
+
+                self.database.insert_data(data,temp_target)
+
+            else:
+                return data, temp_target
+                # self.database.insert_data(data,temp_target)
+                # print("to query")
+                # print(data.shape, temp_target.shape )
+                # return data.shape ,temp_target.shape
 
     def _Get_Target(self, outside_img_path = None):
         if  outside_img_path != None:
