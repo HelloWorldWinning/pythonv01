@@ -42,8 +42,8 @@ class MODEL_JPG_VECTOR(object):
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
         # print("movies_jpgs = " ,movies_jpgs)
-        img_path_many = movies_jpgs[10000:10000+5]
-        print(img_path_many)
+        img_path_many = movies_jpgs[10003:10000+5]
+        # print(img_path_many)
         return img_path_many
 
     def Jpg_To_Vector(self, img_path):
@@ -80,36 +80,21 @@ class MODEL_JPG_VECTOR(object):
 
         if img_path_many ==None:
             img_path_many = list(self.img_path_many)
+        elif isinstance(img_path_many,str):
+            print("str or nor ".center(50,"%"))
+            img_path_many = [img_path_many]
         elif isinstance(img_path_many,list):
-            img_path_many =
+            pass
         else:
-            img_path_many =[img_path_many]
+            raise Exception(" img_path_many must be  a list containing  a image path(s)   ")
 
         chunk = self.chunk
 
-        print("=^"*40)
-        # for i in img_path_many:
-        #     print("img_path_many", i)
-        # one_flag =False
-
-        print("before str".center(40,"$"))
-        print(img_path_many)
-        if isinstance(img_path_many,str):
-            print("str or nor ".center(50,"%"))
-            img_path_many = [img_path_many]
-        #     one_flag = True
-        # if len(img_path_many)==1:
-        #     one_flag =True
-            # img_path_many.extend(img_path_many)
-        # for index, img_path in enumerate(img_path_many):
-        #     print(index,img_path)
-
         leng = len(img_path_many)
-        # print("leng = len(img_path_many)", len(img_path_many))
-        # data = img_path_many
+
         i = 0
         while i * chunk < leng:
-            print("=" * 30)
+            # print("=" * 30)
             start_of_slice = i * chunk
             end_of_slice = min((i + 1) * chunk, leng)
 
@@ -122,13 +107,6 @@ class MODEL_JPG_VECTOR(object):
 
             temp_zero_array = np.zeros([temp_chunk, 299, 299, 3], dtype=np.float32)
 
-            # one_flag =False
-            # if isinstance(img_path_many, str):
-            #     img_path_many = [img_path_many,img_path_many]
-            #     # img_path_many = [img_path_many,img_path_many]
-            #     one_flag =True
-            print("================truth=====================")
-            print(img_path_many)
             for index, img_path in enumerate(img_path_many[start_of_slice:end_of_slice]):
 
                 self.b1_img_path = img_path
@@ -139,10 +117,6 @@ class MODEL_JPG_VECTOR(object):
 
                 self.b2_x_array = x
                 x = np.expand_dims(x, axis=0)
-
-                # self.b3_x_expand = x
-                # x = self._preprocess_input(x)
-                # self.b4_x_preprocessed = x
 
                 temp_zero_array[index] = x
 
@@ -164,7 +138,7 @@ class MODEL_JPG_VECTOR(object):
             data = output_of_model.reshape(temp_chunk, -1)
             self.b6_data = data
             # print(data)
-            print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
+            # print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
 
             i += 1
 
@@ -198,9 +172,10 @@ folder_path = "/data/bar03/output"
 
 bar = MODEL_JPG_VECTOR(folder_path=folder_path)
 # ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
-one_jpg = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
-# one_jpg
-
+one_jpg = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1:],to_database=True)
+one_jpg_1 = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
+print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(100)  )
+print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )
 # ten_jpg
 # print((bar.b3_x_expand == bar.a3_x_expand).all(), "(bar.b3_x_expand == bar.a3_x_expand).all()")
-# print(  "(one_jpg == ten_jpg).all() =" ,(one_jpg == ten_jpg).all()  )
+# print(  "(one_jpg.flatten() == ten_jpg[-1].flatten()).all() =" ,(one_jpg.flatten() == ten_jpg[-1].flatten()).all()  )
