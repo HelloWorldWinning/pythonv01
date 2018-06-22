@@ -47,21 +47,23 @@ class MODEL_JPG_VECTOR(object):
         return img_path_many
 
     def Jpg_To_Vector(self, img_path):
+        if isinstance(img_path,list):
+            img_path = img_path[0]
+
         self.a1_img_path = img_path
         img = self._image.load_img(img_path, target_size=(299, 299))
         x = self._image.img_to_array(img)
         x = np.expand_dims(x, axis=0)
         x = self._preprocess_input(x)
         # self.a4_preprocessed = x
-
-        output_of_model = self._model.predict(x.copy(), batch_size=1)
+        output_of_model = self._model.predict(x, batch_size=1)
         # self.a5_output = output_of_model
         self.a6_data = output_of_model.reshape(1, -1)
 
-        return self.a6_data
+        return self.a6_data,self._Get_Target(outside_img_path=img_path)
 
     def Jpg_To_Vector_DataBase(self,img_path_many=None,to_database=None):
-        # print("999999999999999", img_path_many)
+
         if  to_database== None:
             raise Exception(" select pump data to_database= <True>/<False> ")
 
@@ -108,23 +110,32 @@ class MODEL_JPG_VECTOR(object):
             temp_zero_array /= 127.5
             temp_zero_array -= 1.
 
-            # self.b3_x_expand_temp_zero_array = temp_zero_array
             output_of_model = self._model.predict(temp_zero_array, batch_size=1)
             # self.b5_output = output_of_model
             data = output_of_model.reshape(temp_chunk, -1)
             # self.b6_data = data
             # print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
             i += 1
+        temp_target =    self.target[start_of_slice: end_of_slice]
 
         if to_database:
             print("to database")
-            return data
+            return data ,temp_target
         else:
             print("to query")
-            return data
+            return data ,temp_target
 
-    def _Get_Target(self):
-        img_path_many = self.img_path_many
+    def _Get_Target(self, outside_img_path = None):
+        if  outside_img_path != None:
+            if isinstance(outside_img_path,str):
+                img_path_many = [outside_img_path]
+            elif isinstance(outside_img_path,list) :
+                img_path_many = outside_img_path
+            else:
+                raise  Exception("input is not right")
+        else:
+            img_path_many = self.img_path_many
+
         name_fps = np.zeros([len(img_path_many), 2])
         frames_location = np.zeros(len(img_path_many))
         for index, str_i in enumerate(img_path_many):
@@ -134,14 +145,17 @@ class MODEL_JPG_VECTOR(object):
             frames_location[index] = np.array(float(frames_tmp))
         name_sec = name_fps
         name_sec[:, 1] = frames_location / name_fps[:, 1]
+        if outside_img_path  !=  None:
+            return name_sec
         self.target = name_sec
 
 folder_path = "/data/bar03/output"
 
 bar = MODEL_JPG_VECTOR(folder_path=folder_path)
 
+
 ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
-one_jpg = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1:],to_database=True)
+one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-2])
 # one_jpg_1 = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
-print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(100)  )
-print( ( one_jpg.flatten() ==ten_jpg[-1].flatten() ).all() )
+# print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(1)  )
+# print( ( one_jpg.flatten() ==ten_jpg[-1].flatten() ).all() )

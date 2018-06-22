@@ -1,12 +1,13 @@
 # print("you are shit")
 # from keras.preprocessing import image
 # image.load_img
-
+import pandas as pd
+import numpy as np
 import datetime
 from pymongo import MongoClient
+import json
 
-
-class DataBase():
+class DATABASE():
 
     def __init__(self, bindip="127.0.0.1", port="27017"):
         from pymongo import MongoClient
@@ -23,7 +24,7 @@ class DataBase():
     def collection_chose(self, collection_name):
         self.collection = self.database[collection_name]
 
-    def get_data(self, movie_name_field="movies", movie_name=None, numpy_data=True, *args, **kwargs):
+    def get_data(self, movie_name_field="movie_name", movie_name=None, numpy_data=True, *args, **kwargs):
         if movie_name is None:
             query_str = {"$exists": True}
         else:
@@ -43,12 +44,12 @@ class DataBase():
         self.collection.insert(json.loads(data_target.to_json(orient="records")))
 
 
-data_to_database = DataBase()
-print(data_to_database.collections_of_eachdatabase)
-data_to_database.database_chose("bar")
-data_to_database.collection_chose("runoob444444")
-
-def xxoo():
-    print("xx00")
-
-xxoo()
+# data_to_database = DATABASE()
+# print(data_to_database.collections_of_eachdatabase)
+# # data_to_database.database_chose("bar")
+# # data_to_database.collection_chose("runoob444444")
+#
+# def xxoo():
+#     print("xx00")
+#
+# xxoo()
