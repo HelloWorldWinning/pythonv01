@@ -116,7 +116,7 @@ class MODEL_JPG_VECTOR(object):
             # self.b6_data = data
             # print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
             i += 1
-        temp_target =    self.target[start_of_slice: end_of_slice]
+        temp_target = self.target[start_of_slice: end_of_slice]
 
         if to_database:
             print("to database")
@@ -149,13 +149,16 @@ class MODEL_JPG_VECTOR(object):
             return name_sec
         self.target = name_sec
 
-folder_path = "/data/bar03/output"
-
-bar = MODEL_JPG_VECTOR(folder_path=folder_path)
 
 
-ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
-one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-2])
+# folder_path = "/data/bar03/output"
+
+# bar = MODEL_JPG_VECTOR(folder_path=folder_path)
+
+# ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
+# one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-2])
+
+
 # one_jpg_1 = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
 # print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(1)  )
 # print( ( one_jpg.flatten() ==ten_jpg[-1].flatten() ).all() )
