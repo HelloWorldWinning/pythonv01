@@ -77,10 +77,13 @@ class MODEL_JPG_VECTOR(object):
         # print("999999999999999", img_path_many)
         if  to_database== None:
             raise Exception(" select pump data to_database= <True>/<False> ")
+
         if img_path_many ==None:
             img_path_many = list(self.img_path_many)
+        elif isinstance(img_path_many,list):
+            img_path_many =
         else:
-            img_path_many = list(img_path_many)
+            img_path_many =[img_path_many]
 
         chunk = self.chunk
 
@@ -89,9 +92,11 @@ class MODEL_JPG_VECTOR(object):
         #     print("img_path_many", i)
         # one_flag =False
 
-
-        # if isinstance(img_path_many,str):
-        #     img_path_many = [ img_path_many,img_path_many]
+        print("before str".center(40,"$"))
+        print(img_path_many)
+        if isinstance(img_path_many,str):
+            print("str or nor ".center(50,"%"))
+            img_path_many = [img_path_many]
         #     one_flag = True
         # if len(img_path_many)==1:
         #     one_flag =True
@@ -100,7 +105,7 @@ class MODEL_JPG_VECTOR(object):
         #     print(index,img_path)
 
         leng = len(img_path_many)
-        print("leng = len(img_path_many)", len(img_path_many))
+        # print("leng = len(img_path_many)", len(img_path_many))
         # data = img_path_many
         i = 0
         while i * chunk < leng:
@@ -122,6 +127,8 @@ class MODEL_JPG_VECTOR(object):
             #     img_path_many = [img_path_many,img_path_many]
             #     # img_path_many = [img_path_many,img_path_many]
             #     one_flag =True
+            print("================truth=====================")
+            print(img_path_many)
             for index, img_path in enumerate(img_path_many[start_of_slice:end_of_slice]):
 
                 self.b1_img_path = img_path
@@ -141,6 +148,7 @@ class MODEL_JPG_VECTOR(object):
 
                 print("name_index =", name_index, "temp_chunk =", temp_chunk, "temp_zero_array.shape =", temp_zero_array.shape)
                 name_index += 1
+
             temp_zero_array /= 127.5
             temp_zero_array -= 1.
 
@@ -149,15 +157,17 @@ class MODEL_JPG_VECTOR(object):
             # x = self._preprocess_input(temp_zero_array)
             # self.b4_preprocessed = x
             # output_of_model = self._model.predict(x, batch_size=32 * 5)
+
             output_of_model = self._model.predict(temp_zero_array, batch_size=1)
 
             self.b5_output = output_of_model
             data = output_of_model.reshape(temp_chunk, -1)
             self.b6_data = data
-            print(data)
-            print(data.shape, self.target[start_of_slice:end_of_slice].shape)
-            print(data.shape, self.target[start_of_slice:end_of_slice].shape)
+            # print(data)
+            print("data.shape =",data.shape, self.target[start_of_slice:end_of_slice].shape)
+
             i += 1
+
         if to_database:
             print("to database")
             # if one_flag:
@@ -187,8 +197,8 @@ class MODEL_JPG_VECTOR(object):
 folder_path = "/data/bar03/output"
 
 bar = MODEL_JPG_VECTOR(folder_path=folder_path)
-ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
-one_jpg = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1:],to_database=True)
+# ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
+one_jpg = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
 # one_jpg
 
 # ten_jpg
