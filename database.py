@@ -44,10 +44,15 @@ class DATABASE():
         self.collection.insert(json.loads(data_target.to_json(orient="records")))
 
 
-# data_to_database = DATABASE()
-# print(data_to_database.collections_of_eachdatabase)
-# # data_to_database.database_chose("bar")
-# # data_to_database.collection_chose("runoob444444")
+if __name__ == "__main__":
+    from pprint import pprint
+
+    data_to_database = DATABASE()
+
+    for i in data_to_database.collections_of_eachdatabase:
+        pprint(i)
+# data_to_database.database_chose("bar")
+# data_to_database.collection_chose("runoob444444")
 #
 # def xxoo():
 #     print("xx00")

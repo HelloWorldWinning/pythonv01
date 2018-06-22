@@ -130,7 +130,7 @@ class MODEL_JPG_VECTOR(object):
 
             if to_database:
                 # print("to database")
-                # print(data.shape, temp_target)
+                print(data.shape, temp_target)
                 # return data,temp_target
 
                 self.database.insert_data(data,temp_target)

@@ -8,7 +8,7 @@ if __name__ =="__main__":
     data_in_out = DATABASE()
     data_in_out.database_chose("bar2")
     data_in_out.collection_chose("bar2")
-    #
-    MODEL_JPG_VECTOR(folder_path = folder_path,database=data_in_out)
-    # data = b.Jpg_To_Vector_DataBase(to_database=True)
+
+    data_to_mongod = MODEL_JPG_VECTOR(chunk=3,folder_path = folder_path,database=data_in_out)
+    data_to_mongod.Jpg_To_Vector_DataBase(to_database=True)
     # print(img_vect.img_path_many)
