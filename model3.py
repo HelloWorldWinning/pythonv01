@@ -48,7 +48,8 @@ class MODEL_JPG_VECTOR(object):
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
         # print("movies_jpgs = " ,movies_jpgs)
-        img_path_many = movies_jpgs[10003:10000+5+5+3]
+        # img_path_many = movies_jpgs[10003:10000+5+5+3]
+        img_path_many = movies_jpgs
         # print(img_path_many)
         if isinstance(img_path_many,str):
             img_path_many = [img_path_many]
@@ -130,10 +131,11 @@ class MODEL_JPG_VECTOR(object):
 
             if to_database:
                 # print("to database")
-                print(data.shape, temp_target)
+                print("chunk =", i-1, data.shape, temp_target.shape)
                 # return data,temp_target
-
+                print("inserting data".center(40,"="))
                 self.database.insert_data(data,temp_target)
+                print("inserted".center(60,"="))
 
             else:
                 return data, temp_target

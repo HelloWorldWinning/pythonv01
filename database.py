@@ -47,14 +47,15 @@ class DATABASE():
 if __name__ == "__main__":
     from pprint import pprint
 
-    data_to_database = DATABASE()
-
-    for i in data_to_database.collections_of_eachdatabase:
+    co = DATABASE()
+    for i in co.collections_of_eachdatabase:
         pprint(i)
-# data_to_database.database_chose("bar")
-# data_to_database.collection_chose("runoob444444")
-#
-# def xxoo():
-#     print("xx00")
-#
-# xxoo()
+
+    # co.database_chose("bar2")
+    # # co.collection_chose("raw_vector01")
+    # # print(  co.database.drop_collection())
+    #
+    # co = DATABASE()
+    # for i in co.collections_of_eachdatabase:
+    #     pprint(i)
+
