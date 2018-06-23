@@ -52,10 +52,16 @@ if __name__ == "__main__":
         pprint(i)
 
     # co.database_chose("bar2")
-    # # co.collection_chose("raw_vector01")
+    # co.collection_chose("raw_vector01")
+    # print("co.get_data().shape =",co.get_data().shape)
     # # print(  co.database.drop_collection())
     #
     # co = DATABASE()
     # for i in co.collections_of_eachdatabase:
     #     pprint(i)
 
+    # co.client.drop_database("bar")
+    # print("  clean  ".center(50,"="))
+    # co = DATABASE()
+    # for i in co.collections_of_eachdatabase:
+    #     pprint(i)
