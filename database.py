@@ -51,10 +51,11 @@ if __name__ == "__main__":
     for i in co.collections_of_eachdatabase:
         pprint(i)
 
-    # co.database_chose("bar2")
+    # co.database_chose("bar")
     # co.collection_chose("raw_vector01")
     # print("co.get_data().shape =",co.get_data().shape)
-    # # print(  co.database.drop_collection())
+    # print( co.database.drop_collection("raw_vector01"))
+
     #
     # co = DATABASE()
     # for i in co.collections_of_eachdatabase:

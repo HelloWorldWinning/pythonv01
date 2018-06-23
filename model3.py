@@ -133,9 +133,9 @@ class MODEL_JPG_VECTOR(object):
                 # print("to database")
                 print("chunk =", i-1, data.shape, temp_target.shape)
                 # return data,temp_target
-                print("inserting data".center(40,"="))
+                print("  inserting data  ".center(40,"="))
                 self.database.insert_data(data,temp_target)
-                print("inserted".center(60,"="))
+                print("  inserted  ".center(80,"$"))
 
             else:
                 return data, temp_target
