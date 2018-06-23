@@ -7,8 +7,9 @@ if __name__ =="__main__":
     folder_path = "/data/bar03/output"
     data_in_out = DATABASE()
     data_in_out.database_chose("bar2")
-    data_in_out.collection_chose("bar2")
+    data_in_out.collection_chose("bar3")
 
-    data_to_mongod = MODEL_JPG_VECTOR(chunk=3,folder_path = folder_path,database=data_in_out)
+    data_to_mongod = MODEL_JPG_VECTOR(chunk=2,folder_path = folder_path,database=data_in_out)
     data_to_mongod.Jpg_To_Vector_DataBase(to_database=True)
-    # print(img_vect.img_path_many)
+    print(data_to_mongod.img_path_many)
+    data = data_in_out.get_data()
