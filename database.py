@@ -6,7 +6,7 @@ import numpy as np
 import datetime
 from pymongo import MongoClient
 import json
-
+import time
 class DATABASE():
 
     def __init__(self, bindip="127.0.0.1", port="27017"):
@@ -41,18 +41,27 @@ class DATABASE():
         df_data = pd.DataFrame(data=d2_arrary_data, columns=range(dimension_of_data))
         df_target = pd.DataFrame(data=d2_target, columns=["movie_name", "second"])
         data_target = df_data.join(df_target)
-        self.collection.insert(json.loads(data_target.to_json(orient="records")))
-
+        insert_result = self.collection.insert_many(json.loads(data_target.to_json(orient="records")))
+        return insert_result
 
 if __name__ == "__main__":
     from pprint import pprint
 
+    print("  old version  ".center(100,"="))
     co = DATABASE()
     for i in co.collections_of_eachdatabase:
         pprint(i)
 
-    co.database_chose("bar")
-    co.collection_chose("raw_vector01")
+    co.database_chose("bar2")
+    # co.collection_chose("raw_vector01")
+    co.collection_chose("bar2_01")
+    print(co.get_data().shape)
+    big_data =int( 1e7)
+    t0 = time.time()
+    insert_result = co.insert_data(np.random.rand(big_data,8),np.random.rand(big_data,2))
+    print(  " insert time cost is    = " , time.time()-t0)
+    print(insert_result)
+    print(insert_result.inserted_ids)
     # print("co.get_data().shape =",co.get_data().shape)
     # print( co.database.drop_collection("raw_vector01"))
         #
@@ -60,6 +69,7 @@ if __name__ == "__main__":
     # for i in co.collections_of_eachdatabase:
     #     pprint(i)
 
+    print("  new   ".center(100,"$"))
     # co.client.drop_database("bar")
     # print("  clean  ".center(50,"="))
     # co = DATABASE()
@@ -67,4 +77,5 @@ if __name__ == "__main__":
     #     pprint(i)
 
 
-    print(co.collection.count() )
+    print(co.collection.count(),co.get_data().shape )
+    print(co.get_data().shape)
