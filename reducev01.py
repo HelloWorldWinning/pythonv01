@@ -176,7 +176,7 @@ IPCA = IncrementalPCA(n_components=200, batch_size=500)
 
 hour = 1
 mimute = 5
-second = 2 * 60 * 60
+second = 3 * 60 * 60
 
 cursor = data_base.collection.find(
     {"movie_name": {"$lte": 9}, "second": {"$lte": second}},
@@ -186,7 +186,6 @@ cursor = data_base.collection.find(
 )
 # cursor_dict = list(cursor)
 # dict_list  =[ list(one_dict.values()) for one_dict in cursor_dict  ]
-# dict_list
 # dict_list
 
 chunk = 300
@@ -216,15 +215,26 @@ while i * chunk < length:
     data_dict_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
     target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
 
+    print(" new chunking  ".center(60, "#"))
     print("    timing    ".center(50,"="))
+
     t0 =time.time()
     IPCA.partial_fit(data_dict_list)
     print("elapsed time = {}".format(time.time()-t0).center(50,"="))
-    print(" new chunk  ".center(60, "#"))
-    print("chunk = ", i, "first50", IPCA.explained_variance_ratio_[:50].sum(),
-          IPCA.explained_variance_ratio_[:10])
-    print("Explain_Ratio(IPCA.explained_variance_ratio_", Explain_Ratio(IPCA.explained_variance_ratio_))
+
+    print("chunk = ", i, "first50", "first 50 100 150 200 =",
+          IPCA.explained_variance_ratio_[:50].sum(),
+          IPCA.explained_variance_ratio_[:100].sum(),
+          IPCA.explained_variance_ratio_[:150].sum(),
+          IPCA.explained_variance_ratio_[:200].sum())
+
+    print("Explain_Ratio(IPCA.explained_variance_ratio_ =",
+          Explain_Ratio(IPCA.explained_variance_ratio_)
+         )
+
     all_result.append(IPCA.explained_variance_ratio_)
+
+
     #     cursor = data_base.collection.find(
     #     {"movie_name":3,"second":{"$lte":2}} ,
     #     { "movie_name":False, "_id":False} ,
@@ -235,7 +245,7 @@ while i * chunk < length:
     i += 1
 
 # save the classifier
-with open('/data/bar03/ipcav02.pkl', 'wb') as file_id:
+with open('/data/bar03/ipcav03.pkl', 'wb') as file_id:
     pickle.dump(IPCA, file_id)
 
 test_data = np.random.rand(10, 204800)
@@ -243,9 +253,11 @@ test_data = np.random.rand(10, 204800)
 test_data_ipcad = IPCA.transform(test_data)
 
 # load it again
-with open('/data/bar03/ipcav02.pkl', 'rb') as file_id:
+with open('/data/bar03/ipcav03.pkl', 'rb') as file_id:
     IPCA_loaded = pickle.load(file_id)
 
 test_data_ipcad_loaded = IPCA.transform(test_data)
 
 print( (test_data_ipcad_loaded == test_data_ipcad).all() )
+
+
