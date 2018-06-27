@@ -164,6 +164,7 @@ class MODEL_JPG_VECTOR(object):
             frames_location[index] = np.array(float(frames_tmp))
         name_sec = name_fps
         name_sec[:, 1] = frames_location / name_fps[:, 1]
+
         if outside_img_path  !=  None:
             return name_sec
         self.target = name_sec
