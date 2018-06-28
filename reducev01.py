@@ -169,10 +169,16 @@ from sklearn.decomposition import IncrementalPCA
 #####################################
 
 print("   ALL    ".center(100, "$"))
+
 all_result = []
+explained_result = []
+
+
 from sklearn.decomposition import IncrementalPCA
 
-IPCA = IncrementalPCA(n_components=200, batch_size=500)
+n_components = 200
+
+IPCA = IncrementalPCA(n_components=n_components, batch_size=500)
 
 hour = 1
 mimute = 5
@@ -181,7 +187,7 @@ second = 3 * 60 * 60
 cursor = data_base.collection.find(
     {"movie_name": {"$lte": 9}, "second": {"$lte": second}},
     {"second": True, "_id": False},
-    batch_size=5000,
+    batch_size=1000,
     cursor_type=pymongo.CursorType.EXHAUST
 )
 # cursor_dict = list(cursor)
@@ -192,6 +198,7 @@ chunk = 300
 length = cursor.count()
 print("  cursor.count()  = {}  ".format(length).center(80, "="))
 # print("cursor.count() = ",length )
+
 
 i = 0
 while i * chunk < length:
@@ -204,12 +211,16 @@ while i * chunk < length:
     else:
         temp_chunk = chunk
 
+    if temp_chunk < n_components:
+        print("temp_chunk < n_componets")
+        break
+
     cursor = data_base.collection.find(
         {"movie_name": {"$lte": 9}, "second": {"$lte": second}},
         {"_id": False},
         batch_size=500,
         cursor_type=pymongo.CursorType.EXHAUST
-    )[start_of_slice:end_of_slice]
+    )[start_of_slice : end_of_slice]
 
     cursor_dict = list(cursor)
     data_dict_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
@@ -220,6 +231,7 @@ while i * chunk < length:
 
     t0 =time.time()
     IPCA.partial_fit(data_dict_list)
+
     print("elapsed time = {}".format(time.time()-t0).center(50,"="))
 
     print("chunk = ", i, "first50", "first 50 100 150 200 =",
@@ -233,7 +245,7 @@ while i * chunk < length:
          )
 
     all_result.append(IPCA.explained_variance_ratio_)
-
+    explained_result.append(Explain_Ratio(IPCA.explained_variance_ratio_))
 
     #     cursor = data_base.collection.find(
     #     {"movie_name":3,"second":{"$lte":2}} ,
@@ -250,7 +262,7 @@ with open('/data/bar03/ipcav03.pkl', 'wb') as file_id:
 
 test_data = np.random.rand(10, 204800)
 
-test_data_ipcad = IPCA.transform(test_data)
+test_data_ipcaed = IPCA.transform(test_data)
 
 # load it again
 with open('/data/bar03/ipcav03.pkl', 'rb') as file_id:
@@ -258,6 +270,6 @@ with open('/data/bar03/ipcav03.pkl', 'rb') as file_id:
 
 test_data_ipcad_loaded = IPCA.transform(test_data)
 
-print( (test_data_ipcad_loaded == test_data_ipcad).all() )
+print((test_data_ipcad_loaded == test_data_ipcaed).all())
 
 
