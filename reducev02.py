@@ -3,13 +3,17 @@ from database import DATABASE
 
 data_base_of_raw_data =DATABASE()
 data_base_of_raw_data.database_chose("bar")
-data_base_of_raw_data.database_chose("raw_vector01")
+data_base_of_raw_data.collection_chose("raw_vector01")
 
 print(data_base_of_raw_data.collection)
+
 class VECTORS_REDUCE():
-    def __init__(self, data_base_of_raw_data):
+
+    def __init__(self, data_base_of_raw_data,n_components = 200,batch_size=600):
         self.data_base = data_base_of_raw_data
         self.second = 10 * 60 * 60
+        self.n_components = n_components
+        self.batch_size = batch_size
 
     def _Moive_Name_List(self, movie_name_list):
         if isinstance(movie_name_list, str):
@@ -17,7 +21,12 @@ class VECTORS_REDUCE():
         self.movie_name_list = movie_name_list
         return self.movie_name_list
 
-    def _Set_Ipca(self, n_components=200, batch_size=600, copy=True):
+    def _Set_Ipca(self, n_components=None, batch_size=None, copy=True):
+        if n_components == None:
+            n_components = self.n_components
+        if  batch_size  == None:
+            batch_size =self.batch_size
+
         from sklearn.decomposition import IncrementalPCA
         IPCA = IncrementalPCA(n_components=n_components, batch_size=batch_size, copy=copy)
         self.Ipca = IPCA
@@ -69,9 +78,9 @@ class VECTORS_REDUCE():
             print("  one time chunk_time  ".center(70, "="))
             print(cursor.count())
 
-            if cursor.count() < n_components:
-                print("  cursor.count() < n_components  ")
-                break
+            # if cursor.count() < self.n_components:
+            #     print("  cursor.count() < n_components  ")
+            #     break
             if cursor.count() == 0:
                 print(" cursor.count() == 0 ")
                 break
