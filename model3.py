@@ -145,13 +145,13 @@ class MODEL_JPG_VECTOR(object):
                 # return data.shape ,temp_target.shape
 
     def _Get_Target(self, outside_img_path = None):
-        if  outside_img_path != None:
+        if outside_img_path is not None:
             if isinstance(outside_img_path,str):
                 img_path_many = [outside_img_path]
-            elif isinstance(outside_img_path,list) :
+            elif isinstance(outside_img_path,list):
                 img_path_many = outside_img_path
             else:
-                raise  Exception("input is not right")
+                raise Exception("input is not right")
         else:
             img_path_many = self.img_path_many
 
@@ -165,7 +165,7 @@ class MODEL_JPG_VECTOR(object):
         name_sec = name_fps
         name_sec[:, 1] = frames_location / name_fps[:, 1]
 
-        if outside_img_path  !=  None:
+        if outside_img_path != None:
             return name_sec
         self.target = name_sec
 
