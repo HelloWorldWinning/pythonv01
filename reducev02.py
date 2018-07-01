@@ -1,3 +1,5 @@
+import pickle
+
 from database import DATABASE
 
 data_base_of_raw_data = DATABASE()
@@ -9,19 +11,33 @@ print(data_base_of_raw_data.collection)
 
 class VECTORS_REDUCE():
 
-    def __init__(self, data_base_of_raw_data, n_components=200, batch_size=600,reset_pca =True):
+    def __init__(self, data_base_of_raw_data, movie_folder = None,
+                 n_components=200, batch_size=600, model_path = None, reset_pca=True):
         self.data_base = data_base_of_raw_data
         self.second = 10 * 60 * 60
         self.n_components = n_components
         self.batch_size = batch_size
-        self.reset_pca = True
-        if self.reset_pca is True:
+        if reset_pca is True:
             self._Set_Ipca()
+            self.reset_pca = True
+        else:
+            self.reset_pca = False
+
+        if movie_folder is not None:
+            self._movie_folder = movie_folder
+
+        if model_path is None:
+            self._model_path = "/data/bar03/ipcav05.pkl"
+        else:
+            self._model_path = model_path
 
     def _Moive_Name_List(self, movie_name_list):
+
         if isinstance(movie_name_list, str):
             movie_name_list = [movie_name_list]
+
         self.movie_name_list = movie_name_list
+
         return self.movie_name_list
 
     def _Set_Ipca(self, n_components=None, batch_size=None, copy=True):
@@ -62,13 +78,12 @@ class VECTORS_REDUCE():
 
     #     chunk_time,chunk_count = Dynamic_Chunk_Time(movie_name=movie_name)
 
-    def Train_Ipca(self, movie_name):
+    def Ipca_Train(self, movie_name):
 
         data_base = self.data_base
         chunk_time, chunk_count = self._Dynamic_Chunk_Time(movie_name=movie_name)
 
         i = 0
-
         while True:
 
             left = i * chunk_time
@@ -96,13 +111,18 @@ class VECTORS_REDUCE():
 
             print(dict_list[-6:], len(dict_list))
 
-
             i += 1
 
-            # if i % 10000 == 0 and self.reset_pca:
-            #     with open('/data/bar03/ipcav05.pkl', 'wb') as file_id:
-            #         pickle.dump(self.Ipca, file_id)
+            if i % 10000 == 0 and self.reset_pca:
+                with open(self._model_path, 'wb') as file_id:
+                    pickle.dump(self.Ipca, file_id)
+
+    def Ipca_Predict(self):
+        with open( self._model_path, 'rb') as file_id:
+            IPCA_loaded = pickle.load(file_id)
+
+        test_data_ipcad_loaded = IPCA.transform(test_data)
 
 
 bar = VECTORS_REDUCE(data_base_of_raw_data)
-bar.Train_Ipca(0)
+bar.Ipca_Train(0)
