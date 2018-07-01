@@ -1,19 +1,22 @@
 from database import DATABASE
 
-
-data_base_of_raw_data =DATABASE()
+data_base_of_raw_data = DATABASE()
 data_base_of_raw_data.database_chose("bar")
 data_base_of_raw_data.collection_chose("raw_vector01")
 
 print(data_base_of_raw_data.collection)
 
+
 class VECTORS_REDUCE():
 
-    def __init__(self, data_base_of_raw_data,n_components = 200,batch_size=600):
+    def __init__(self, data_base_of_raw_data, n_components=200, batch_size=600,reset_pca =True):
         self.data_base = data_base_of_raw_data
         self.second = 10 * 60 * 60
         self.n_components = n_components
         self.batch_size = batch_size
+        self.reset_pca = True
+        if self.reset_pca is True:
+            self._Set_Ipca()
 
     def _Moive_Name_List(self, movie_name_list):
         if isinstance(movie_name_list, str):
@@ -22,6 +25,7 @@ class VECTORS_REDUCE():
         return self.movie_name_list
 
     def _Set_Ipca(self, n_components=None, batch_size=None, copy=True):
+
         if n_components is None:
             n_components = self.n_components
         if batch_size is None:
@@ -35,8 +39,9 @@ class VECTORS_REDUCE():
     def _Dynamic_Chunk_Time(self, movie_name=None, chunk_min=200, chunk_max=600, max_second=100):
         """ return chunk_time second and chunk block count
         """
+
         if movie_name is None:
-            raise ValueError (" there is no movie_name")
+            raise ValueError(" there is no movie_name")
         data_base = self.data_base
         for chunk_time in range(8, max_second):
             left = 0
@@ -91,7 +96,12 @@ class VECTORS_REDUCE():
 
             print(dict_list[-6:], len(dict_list))
 
+
             i += 1
+
+            # if i % 10000 == 0 and self.reset_pca:
+            #     with open('/data/bar03/ipcav05.pkl', 'wb') as file_id:
+            #         pickle.dump(self.Ipca, file_id)
 
 
 bar = VECTORS_REDUCE(data_base_of_raw_data)
