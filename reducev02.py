@@ -8,7 +8,6 @@ data_base_of_raw_data.collection_chose("raw_vector01")
 
 print(data_base_of_raw_data.collection)
 
-
 class VECTORS_REDUCE():
 
     def __init__(self, data_base_of_raw_data, movie_folder = None,
