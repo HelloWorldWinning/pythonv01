@@ -1,20 +1,39 @@
+import time
 import pickle
 import subprocess
-
 from database import DATABASE
-
-
-
+import numpy as np
 
 class VECTORS_REDUCE():
 
-    def __init__(self, data_base_of_raw_data, folder_containing_movies=None,
+    def __init__(self, data_base_of_raw_data =None, data_base_reduced =None,
+                 folder_containing_movies=None,
                  movie_name_list=None,
-                 n_components=200, batch_size=600, ipca_model_path=None, reset_pca=True):
-        self.data_base = data_base_of_raw_data
+                 n_components=160, batch_size=600,
+                 ipca_model_path=None,
+                 reset_pca=True,
+                 to_train=True,
+                 movie_name_int_path = "/data/bar03/moive_name_list_new.txt"
+                 ):
+        self.movie_name_int_path = movie_name_int_path
+        if data_base_of_raw_data is not None:
+            self.data_base = data_base_of_raw_data
+        if data_base_reduced is not None:
+            self.data_base_reduced = data_base_reduced
+
         self.second = 10 * 60 * 60
         self.n_components = n_components
         self.batch_size = batch_size
+        if not isinstance(to_train,bool):
+            raise ValueError(
+                    """ to_train =True means to train pca data
+                        to_train =False means to reduce data's dimension ,so to get feature.
+                        you must decide to train a ipca model or    
+                        reduce data's dimention to feature data base."
+                    """)
+        self.to_train = to_train
+        if not self.to_train:
+            self.Ipca_Reduced()
 
         if reset_pca is True:
             self._Set_Ipca()
@@ -40,8 +59,8 @@ class VECTORS_REDUCE():
         else:
             self._model_path = ipca_model_path
 
-
     def _Get_Moive_Name_From_Folder(self, movie_folder=None):
+
         if movie_folder is None:
             movie_folder = self._movie_folder
 
@@ -49,6 +68,11 @@ class VECTORS_REDUCE():
         movie_names = subprocess.check_output(["ls", movie_folder]).decode("utf-8").split("\n")
         movie_names = [i for i in movie_names if i.endswith(movie_suffix)]
         # self.movie_name_list = movie_names
+        # todo_2  movie_name_list to movie_int_list
+        with open(self.movie_name_int_path, encoding="utf-8") as file:
+            movie_name_list = [l.strip() for l in file]
+        self.movie_name_list = [ movie_name_list.index(i) for i  in movie_names]
+
         return self.movie_name_list
 
     def _Moive_Name_List(self, movie_name_list):
@@ -60,7 +84,7 @@ class VECTORS_REDUCE():
 
         return self.movie_name_list
 
-    def _Set_Ipca(self, n_components=None, batch_size=None, copy=True):
+    def _Set_Ipca(self, n_components=None, batch_size=None, copy=False):
 
         if n_components is None:
             n_components = self.n_components
@@ -72,14 +96,16 @@ class VECTORS_REDUCE():
         self.Ipca = IPCA
         return self.Ipca
 
-    def _Dynamic_Chunk_Time(self, movie_name=None, chunk_min=200, chunk_max=600, max_second=100):
+    def _Dynamic_Chunk_Time(self, movie_name=None, chunk_min=180, chunk_max=400, max_second=100):
+
         """ return chunk_time second and chunk block count
         """
-
         if movie_name is None:
             raise ValueError(" there is no movie_name")
+
         data_base = self.data_base
-        for chunk_time in range(8, max_second):
+
+        for chunk_time in np.arange(2, max_second,0.5):
             left = 0
             right = chunk_time
             cursor = data_base.collection.find(
@@ -92,6 +118,7 @@ class VECTORS_REDUCE():
                 #             print("chunk_time =",chunk_time,"cursor.count() =",cursor.count())
                 self.chunk_time = chunk_time
                 self.chunk_count = cursor.count()
+                print( "self.chunk_time, self.chunk_count" ,self.chunk_time, self.chunk_count)
                 return self.chunk_time, self.chunk_count
 
         raise Exception("can not get time chunk_time second")
@@ -102,30 +129,42 @@ class VECTORS_REDUCE():
 
         if movie_name_list is None:
             for movie_name in self.movie_name_list:
-                self.Ipca_Train(movie_name)
+                self.Ipca_Train_Reduce(movie_name)
         else:
             for movie_name in movie_name_list:
-                self.Ipca_Train(movie_name)
+                self.Ipca_Train_Reduce(movie_name)
 
-    def Ipca_Train(self, movie_name,to_train=True):
+    def Data_To_Feature(self, movie_name_list =None,):
+
+        if movie_name_list is None:
+            for movie_name in self.movie_name_list:
+                self.Ipca_Train_Reduce(movie_name=movie_name,to_reduce_data=True)
+        else:
+            for movie_name in movie_name_list:
+                self.Ipca_Train_Reduce(movie_name=movie_name,to_reduce_data=True)
+
+
+    def Ipca_Train_Reduce(self, movie_name, to_reduce_data = None):
 
         data_base = self.data_base
         chunk_time, chunk_count = self._Dynamic_Chunk_Time(movie_name=movie_name)
 
         i = 0
         while True:
+            print("  one time chunk_time  ".center(70, "="))
 
             left = i * chunk_time
             right = (i + 1) * chunk_time
 
-            # what data you want
+            # todo 1  what data you want
+
             cursor = data_base.collection.find(
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
-                {"second": True, "_id": False},
+                {"_id": False},  # "second": True,
                 batch_size=50000,
                 #     cursor_type= pymongo.CursorType.EXHAUST
             )
-            print("  one time chunk_time  ".center(70, "="))
+
             print(cursor.count())
 
             if cursor.count() < self.n_components:
@@ -134,27 +173,41 @@ class VECTORS_REDUCE():
             if cursor.count() == 0:
                 print(" cursor.count() == 0 ")
                 break
-
+            t0 = time.time()
             cursor_dict = list(cursor)
             dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
-            print(dict_list[-6:], len(dict_list))
+            print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
+
 
             dict_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
-            # target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
+            target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
+            print("len(dict_list) =", len(dict_list),
+                  "len(dict_list[-1] =", len(dict_list[-1]),
+                  "target_list[-1][-3:]",target_list[-1][-3:]
+                  )
 
-            if to_train:
-                # train ipca chunk by chunk
-                self.Ipca.partial_fit(dict_list)
+            # To Train
 
-                if i % 3 == 0 and self.reset_pca:
-                    with open(self._model_path, 'wb') as file_id:
-                        pickle.dump(self.Ipca, file_id)
-            else:
-                pass
+            # if self.to_train:
+            #     # train ipca chunk by chunk
+            #     self.Ipca.partial_fit(dict_list)
+            #
+            #     if i % 100 == 0 and self.reset_pca:
+            #
+            #         with open(self._model_path, 'wb') as file_id:
+            #             pickle.dump(self.Ipca, file_id)
+
+            # to reduce data
+            # if to_reduce_data:
+            #     ipcaed_vector = self.Ipca_loaded.transform(dict_list)
+            #     target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
+            #     # todo_1
+            #     # insert reduced data to reduced database
+            #     self.data_base_reduced.insert_data(ipcaed_vector, target_list)
 
             i += 1  # increase while
 
-    def Ipca_Predict(self):
+    def Ipca_Reduced(self):
         with open(self._model_path, 'rb') as file_id:
             Ipca_loaded = pickle.load(file_id)
             self.Ipca_loaded = Ipca_loaded
@@ -164,10 +217,24 @@ class VECTORS_REDUCE():
 if __name__ == "__main__":
 
     data_base_of_raw_data = DATABASE()
-    print(data_base_of_raw_data.collections_of_eachdatabase)
     data_base_of_raw_data.database_chose("bar")
     data_base_of_raw_data.collection_chose("raw_vector01")
-    print(data_base_of_raw_data.collection)
 
-    bar = VECTORS_REDUCE(data_base_of_raw_data, movie_name_list=[3])
-    bar.Movie_To_Train_Ipca()
+    data_base_reduced = DATABASE()
+    data_base_reduced.database_chose("bar")
+    data_base_reduced.collection_chose("raw_vector01_redu")
+
+    train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
+                           data_base_reduced =data_base_reduced,
+                           # folder_containing_movies="/data/bar03",
+                           movie_name_list=[0])
+    # print(train_ipca._Get_Moive_Name_From_Folder())
+    # print(train_ipca.movie_name_list)
+
+    train_ipca.Movie_To_Train_Ipca()
+
+    # vector_to_feature = VECTORS_REDUCE(  data_base_of_raw_data = data_base_of_raw_data,
+    #                        data_base_reduced =data_base_reduced,
+    #                        movie_name_list=[3],
+    #                        to_train=False
+    #                                      )
