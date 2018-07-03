@@ -3,6 +3,7 @@ import pickle
 import subprocess
 from database import DATABASE
 import numpy as np
+import pymongo
 
 class VECTORS_REDUCE():
 
@@ -111,8 +112,8 @@ class VECTORS_REDUCE():
             cursor = data_base.collection.find(
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
                 {"_id": True},  # "second":True,
-                batch_size=500000,
-                #                 cursor_type= pymongo.CursorType.EXHAUST
+                batch_size=1000,
+                       # cursor_type= pymongo.CursorType.EXHAUST
             )
             if cursor.count() >= chunk_min and cursor.count() <= chunk_max:
                 #             print("chunk_time =",chunk_time,"cursor.count() =",cursor.count())
@@ -151,7 +152,7 @@ class VECTORS_REDUCE():
 
         i = 0
         while True:
-            print("  one time chunk_time  ".center(70, "="))
+            print("  once chunk_time  ".center(90, "="))
 
             left = i * chunk_time
             right = (i + 1) * chunk_time
@@ -161,8 +162,8 @@ class VECTORS_REDUCE():
             cursor = data_base.collection.find(
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
                 {"_id": False},  # "second": True,
-                batch_size=50000,
-                #     cursor_type= pymongo.CursorType.EXHAUST
+                batch_size=1000,
+                cursor_type= pymongo.CursorType.EXHAUST
             )
 
             print(cursor.count())
@@ -175,7 +176,7 @@ class VECTORS_REDUCE():
                 break
             t0 = time.time()
             cursor_dict = list(cursor)
-            dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
+            # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
             print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
 
 
@@ -183,7 +184,7 @@ class VECTORS_REDUCE():
             target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
             print("len(dict_list) =", len(dict_list),
                   "len(dict_list[-1] =", len(dict_list[-1]),
-                  "target_list[-1][-3:]",target_list[-1][-3:]
+                  "target_list[-1][-3:]",target_list[-3:]
                   )
 
             # To Train
