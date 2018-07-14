@@ -266,7 +266,6 @@ if __name__ == "__main__":
                            movie_name_list = [3],
                            ipca_model_path ="/data/bar03/ipcav06.pkl",
                            reset_pca = True
-
                                 )
 
     # print(train_ipca._Get_Moive_Name_From_Folder())
@@ -277,6 +276,8 @@ if __name__ == "__main__":
     # print("$"*100)
     train_ipca.Ipca_Reduced_Model_Load()
     train_ipca.Data_To_Feature()
+
+
 
     # vector_to_feature = VECTORS_REDUCE(  data_base_of_raw_data = data_base_of_raw_data,
     #                        data_base_reduced =data_base_reduced,
