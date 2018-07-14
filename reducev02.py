@@ -167,9 +167,9 @@ class VECTORS_REDUCE():
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
                 {"_id": False},  # "second": True,
                 batch_size = 1000,
-                cursor_type = pymongo.CursorType.EXHAUST )
+                cursor_type = pymongo.CursorType.EXHAUST)
 
-            print(cursor.count())
+            print("  cursor.count()   =  {}".format(cursor.count()).center(50, "*"))
 
             if cursor.count() < self.n_components:
                 print("  cursor.count() < n_components  ")
@@ -183,33 +183,47 @@ class VECTORS_REDUCE():
             cursor.close()
 
             # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
-            print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
+
+            print("   read data time = {} ".format(time.time()-t0).center(90, "*"))
 
             data_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
             target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
+
             print("len(dict_list) =", len(data_list),
                   "len(dict_list[-1] =", len(data_list[-1]),
                   "target_list[-3:]",target_list[-3:]
                   )
 
-            # To Train
+            # To Train = not to_reduce_data
             if not to_reduce_data:
                 # if self.to_train:
                     # train ipca chunk by chunk
-                self.Ipca.partial_fit(data_list)
-
-                if i % 100 == 0 and self.reset_pca:
-
-                    with open(self._model_path, 'wb') as file_id:
-                        pickle.dump(self.Ipca, file_id)
+                print(" to train model, data length is = {} ,data dimension is = {}, target length = {}"
+                      .format(len(data_list), len(data_list[-1]), len(target_list)))
+                # self.Ipca.partial_fit(data_list)
+                #
+                # if i % 100 == 0 and self.reset_pca:
+                #
+                #     with open(self._model_path, 'wb') as file_id:
+                #         pickle.dump(self.Ipca, file_id)
 
             # To Reduce Data
             if to_reduce_data:
-                ipcaed_vector = self.Ipca_Loaded.transform(data_list)
+
+                print(" to predict data, data length is = {} ,data dimension is = {}, target length = {}"
+                      .format(len(data_list), len(data_list[-1]), len(target_list)))
+
+                # To Reduce Data
+                # ipcaed_vector = self.Ipca_Loaded.transform(data_list)
+
+
                 # target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
                 # todo_1
                 # insert reduced data to reduced database
-                self.data_base_reduced.insert_data(ipcaed_vector, target_list)
+
+
+                # Insert Reduced data to database
+                # self.data_base_reduced.insert_data(ipcaed_vector, target_list)
 
             i += 1  # increase while
 
