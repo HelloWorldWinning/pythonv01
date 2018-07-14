@@ -25,18 +25,21 @@ class VECTORS_REDUCE():
         self.second = 10 * 60 * 60
         self.n_components = n_components
         self.batch_size = batch_size
-        if not isinstance(to_train,bool):
-            raise ValueError(
-                    """ to_train =True means to train pca data
-                        to_train =False means to reduce data's dimension ,so to get feature.
-                        you must decide to train a ipca model or    
-                        reduce data's dimention to feature data base."
-                    """)
+        # if not isinstance(to_train,bool):
+        #     raise ValueError(
+        #             """ to_train =True means to train pca data
+        #                 to_train =False means to reduce data's dimension ,so to get feature.
+        #                 you must decide to train a ipca model or
+        #                 reduce data's dimention to feature data base."
+        #             """)
         # self.to_train = to_train
         # if not self.to_train:
 
         # Load Trained_Pic Model
-        self.Ipca_Reduced()
+        try:
+            self.Ipca_Reduced_Model_Load()
+        except:
+            print(" no pca model to load")
 
         # Reset Pca
         if reset_pca is True:
@@ -171,8 +174,8 @@ class VECTORS_REDUCE():
 
             print("  cursor.count()   =  {}".format(cursor.count()).center(50, "*"))
 
-            if cursor.count() < self.n_components:
-                print("  cursor.count() < n_components  ")
+            if cursor.count() ==0:
+                print("        cursor.count() ==0       ")
                 break
             # if cursor.count() == 0:
             #     print(" cursor.count() == 0 ")
@@ -196,16 +199,19 @@ class VECTORS_REDUCE():
 
             # To Train = not to_reduce_data
             if not to_reduce_data:
+                if cursor.count() < self.n_components:
+                    print("  cursor.count() < n_components  ")
+                    break
                 # if self.to_train:
                     # train ipca chunk by chunk
                 print(" to train model, data length is = {} ,data dimension is = {}, target length = {}"
                       .format(len(data_list), len(data_list[-1]), len(target_list)))
-                # self.Ipca.partial_fit(data_list)
-                #
-                # if i % 100 == 0 and self.reset_pca:
-                #
-                #     with open(self._model_path, 'wb') as file_id:
-                #         pickle.dump(self.Ipca, file_id)
+                self.Ipca.partial_fit(data_list)
+
+                if i % 10 == 0 and self.reset_pca:
+
+                    with open(self._model_path, 'wb') as file_id:
+                        pickle.dump(self.Ipca, file_id)
 
             # To Reduce Data
             if to_reduce_data:
@@ -214,8 +220,10 @@ class VECTORS_REDUCE():
                       .format(len(data_list), len(data_list[-1]), len(target_list)))
 
                 # To Reduce Data
-                # ipcaed_vector = self.Ipca_Loaded.transform(data_list)
-
+                ipcaed_vector = self.Ipca_Loaded.transform(data_list)
+                self.ipcaed_vector  =  ipcaed_vector
+                print(" to predict data, data length is = {} ,data dimension is = {}, target length = {}"
+                      .format(len(ipcaed_vector), len(ipcaed_vector[-1]), len(target_list)))
 
                 # target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
                 # todo_1
@@ -224,13 +232,19 @@ class VECTORS_REDUCE():
 
                 # Insert Reduced data to database
                 # self.data_base_reduced.insert_data(ipcaed_vector, target_list)
+                self.data_base_reduced.insert_data(ipcaed_vector, target_list)
 
             i += 1  # increase while
 
-    def Ipca_Reduced(self):
-        with open(self._model_path, 'rb') as file_id:
-            Ipca_loaded = pickle.load(file_id)
-            self.Ipca_Loaded = Ipca_loaded
+    def Ipca_Reduced_Model_Load(self, model_path =None):
+        if model_path is None:
+            with open(self._model_path, 'rb') as file_id:
+                Ipca_loaded = pickle.load(file_id)
+                self.Ipca_Loaded = Ipca_loaded
+        else:
+            with open(model_path, 'rb') as file_id:
+                Ipca_loaded = pickle.load(file_id)
+                self.Ipca_Loaded = Ipca_loaded
         # test_data_ipcad_loaded = IPCA.transform(test_data)
 
 
@@ -244,15 +258,25 @@ if __name__ == "__main__":
     data_base_reduced.database_chose("bar")
     data_base_reduced.collection_chose("raw_vector01_redu")
 
+    print(data_base_of_raw_data.collections_of_eachdatabase)
+
     train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
                            data_base_reduced =data_base_reduced,
                            # folder_containing_movies="/data/bar03",
-                           movie_name_list=[3])
+                           movie_name_list=[3],
+                           ipca_model_path="/data/bar03/ipcav06.pkl",
+                           reset_pca= True
+
+                                )
 
     # print(train_ipca._Get_Moive_Name_From_Folder())
     # print(train_ipca.movie_name_list)
 
-    train_ipca.Movie_To_Train_Ipca()
+    # train_ipca.Movie_To_Train_Ipca()
+    #
+    # print("$"*100)
+    train_ipca.Ipca_Reduced_Model_Load()
+    train_ipca.Data_To_Feature()
 
     # vector_to_feature = VECTORS_REDUCE(  data_base_of_raw_data = data_base_of_raw_data,
     #                        data_base_reduced =data_base_reduced,
