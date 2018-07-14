@@ -126,7 +126,7 @@ class VECTORS_REDUCE():
 
     #     chunk_time,chunk_count = Dynamic_Chunk_Time(movie_name=movie_name)
 
-    def Movie_To_Train_Ipca(self,movie_name_list=None):
+    def Movie_To_Train_Ipca(self, movie_name_list=None):
 
         if movie_name_list is None:
             for movie_name in self.movie_name_list:
@@ -159,21 +159,21 @@ class VECTORS_REDUCE():
 
             # todo 1  what data you want
 
-            cursor = data_base.collection.find(
+            cursor = data_base.collection.find (
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
                 {"_id": False},  # "second": True,
-                batch_size=1000,
-                cursor_type= pymongo.CursorType.EXHAUST
-            )
+                batch_size = 1000,
+                cursor_type = pymongo.CursorType.EXHAUST )
 
             print(cursor.count())
 
             if cursor.count() < self.n_components:
                 print("  cursor.count() < n_components  ")
                 break
-            if cursor.count() == 0:
-                print(" cursor.count() == 0 ")
-                break
+            # if cursor.count() == 0:
+            #     print(" cursor.count() == 0 ")
+            #     break
+
             t0 = time.time()
             cursor_dict = list(cursor)
             cursor.close()
@@ -182,10 +182,10 @@ class VECTORS_REDUCE():
             print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
 
 
-            dict_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
+            data_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
             target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
-            print("len(dict_list) =", len(dict_list),
-                  "len(dict_list[-1] =", len(dict_list[-1]),
+            print("len(dict_list) =", len(data_list),
+                  "len(dict_list[-1] =", len(data_list[-1]),
                   "target_list[-1][-3:]",target_list[-3:]
                   )
 

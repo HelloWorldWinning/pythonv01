@@ -74,13 +74,12 @@ if __name__ == "__main__":
         t_loop = time.time()
         print("  once chunk_time  ".center(90, "="))
         data_list, target_list, last_id = idlimit(movie_name, page_size, last_id = last_id)
-
         # todo 1  what data you want
         t0 = time.time()
         # if last_id is None:
         #     # print("here")
         #     break
-        print("     target_list   {}  ".format(len(target_list)).center(80,"*") )
+        print("     target_list   {}   ".format(len(target_list)).center(80,"*") )
         if len(target_list) <150:
             print(" 11111111  limit_function return time = {}  ".format(time.time() - t0).center(50, "*"))
             print("  2222222     once loop time = {}      ".format(time.time()-t_loop).center( 100,"*" ))
@@ -89,7 +88,6 @@ if __name__ == "__main__":
         print(" limit_function return time = {}  ".format(time.time() - t0).center(50, "*"))
 
         print("     once loop time = {}      ".format(time.time()-t_loop).center( 100,"*" ))
-
 
 
 # while True:
