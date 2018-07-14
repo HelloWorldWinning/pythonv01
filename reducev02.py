@@ -13,7 +13,7 @@ class VECTORS_REDUCE():
                  n_components=160, batch_size=600,
                  ipca_model_path=None,
                  reset_pca=True,
-                 to_train=True,
+                 # to_train=True,
                  movie_name_int_path = "/data/bar03/moive_name_list_new.txt"
                  ):
         self.movie_name_int_path = movie_name_int_path
@@ -32,11 +32,13 @@ class VECTORS_REDUCE():
                         you must decide to train a ipca model or    
                         reduce data's dimention to feature data base."
                     """)
-        self.to_train = to_train
+        # self.to_train = to_train
         # if not self.to_train:
-        # load trained_pac model
+
+        # Load Trained_Pic Model
         self.Ipca_Reduced()
 
+        # Reset Pca
         if reset_pca is True:
             self._Set_Ipca()
             self.reset_pca = True
@@ -192,18 +194,18 @@ class VECTORS_REDUCE():
 
             # To Train
             if not to_reduce_data:
-                if self.to_train:
+                # if self.to_train:
                     # train ipca chunk by chunk
-                    self.Ipca.partial_fit(dict_list)
+                self.Ipca.partial_fit(data_list)
 
-                    if i % 100 == 0 and self.reset_pca:
+                if i % 100 == 0 and self.reset_pca:
 
-                        with open(self._model_path, 'wb') as file_id:
-                            pickle.dump(self.Ipca, file_id)
+                    with open(self._model_path, 'wb') as file_id:
+                        pickle.dump(self.Ipca, file_id)
 
             # To Reduce Data
             if to_reduce_data:
-                ipcaed_vector = self.Ipca_loaded.transform(data_list)
+                ipcaed_vector = self.Ipca_Loaded.transform(data_list)
                 # target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
                 # todo_1
                 # insert reduced data to reduced database
@@ -214,7 +216,7 @@ class VECTORS_REDUCE():
     def Ipca_Reduced(self):
         with open(self._model_path, 'rb') as file_id:
             Ipca_loaded = pickle.load(file_id)
-            self.Ipca_loaded = Ipca_loaded
+            self.Ipca_Loaded = Ipca_loaded
         # test_data_ipcad_loaded = IPCA.transform(test_data)
 
 
