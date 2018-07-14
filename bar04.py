@@ -28,36 +28,36 @@ def idlimit(movie_name, page_size, last_id=None):
         cursor = data_base.collection.find({"movie_name": movie_name, '_id': {'$gt': last_id}}
                                            ).limit(page_size)
     # print("cursor.count() =",cursor.count())
-    t0 = time.time()
+
     cursor_dict = list(cursor)
     cursor.close()
 
+    t0 = time.time()
+
     length_of_chunk = len(cursor_dict)
-    print("len(cursor_dict)) =", length_of_chunk)
+    print("    cursor.count()  =", cursor.count())
+    print("    len(cursor_dict)) =", length_of_chunk)
     # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
 
     print("   read data time = {}  ".format(time.time() - t0).center(60, "*"))
     print(" length of cursor = {}".format(len(cursor_dict)).center(40,"$"))
-    if len(cursor_dict) < 150:
-        print("len(cursor_dict) < 150:")
-        return None, None, None
+    # if len(cursor_dict) < 150:
+    #     print("len(cursor_dict) < 150:")
+    #     return None, None, None
 
     # if length_of_chunk< 150:
     #     # print("len(cursor_dict) < 150:" )
     #     return 0,0,0
 
-    dict_data_list = [list(one_dict.values())[1:-2] for one_dict in cursor_dict]
+    data_list = [list(one_dict.values())[1:-2] for one_dict in cursor_dict]
     target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
-    print("len(dict_list) =", len(dict_data_list),
-          "len(dict_list[-1] =", len(dict_data_list[-1]),
+    print("len(dict_list) =", len(data_list),
+          "len(dict_list[-1] =", len(data_list[-1]),
           "target_list[-3:] =", target_list[-3:]
           )
     last_id = cursor_dict[-1]['_id']
     print("last_id =", last_id)
-
-    return dict_data_list, target_list, last_id
-
-
+    return data_list, target_list, last_id
 
 class self():
     pass
@@ -68,18 +68,28 @@ movie_name = 3
 last_id = None
 i = 0
 
+if __name__ == "__main__":
 
-while True:
-    print("  once chunk_time  ".center(90, "="))
+    while True:
+        t_loop = time.time()
+        print("  once chunk_time  ".center(90, "="))
+        data_list, target_list, last_id = idlimit(movie_name, page_size, last_id = last_id)
 
-    dict_list, target_list, last_id = idlimit(movie_name, page_size, last_id = last_id)
+        # todo 1  what data you want
+        t0 = time.time()
+        # if last_id is None:
+        #     # print("here")
+        #     break
+        print("     target_list   {}  ".format(len(target_list)).center(80,"*") )
+        if len(target_list) <150:
+            print(" 11111111  limit_function return time = {}  ".format(time.time() - t0).center(50, "*"))
+            print("  2222222     once loop time = {}      ".format(time.time()-t_loop).center( 100,"*" ))
+            break
 
-    # todo 1  what data you want
-    t0 = time.time()
-    if last_id is None:
-        # print("here")
-        break
-    print(" limit_fun reture time = {}  ".format(time.time() - t0).center(50,"*"))
+        print(" limit_function return time = {}  ".format(time.time() - t0).center(50, "*"))
+
+        print("     once loop time = {}      ".format(time.time()-t_loop).center( 100,"*" ))
+
 
 
 # while True:
