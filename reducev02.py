@@ -33,8 +33,9 @@ class VECTORS_REDUCE():
                         reduce data's dimention to feature data base."
                     """)
         self.to_train = to_train
-        if not self.to_train:
-            self.Ipca_Reduced()
+        # if not self.to_train:
+        # load trained_pac model
+        self.Ipca_Reduced()
 
         if reset_pca is True:
             self._Set_Ipca()
@@ -53,10 +54,11 @@ class VECTORS_REDUCE():
             self.movie_name_list = movie_name_list
         else:
             raise Exception(
-                "You should specify a folder that contains movie files. Or a list that contains a movie names")
+                "You should specify a folder that contains movie files. Or a list that contains a movie names"
+                           )
 
         if ipca_model_path is None:
-            self._model_path = "/data/bar03/ipcav05.pkl"
+            self._model_path = "/data/bar03/ipcav06.pkl"
         else:
             self._model_path = ipca_model_path
 
@@ -130,10 +132,10 @@ class VECTORS_REDUCE():
 
         if movie_name_list is None:
             for movie_name in self.movie_name_list:
-                self.Ipca_Train_Reduce(movie_name)
+                self.Ipca_Train_Reduce(movie_name,to_reduce_data=False)
         else:
             for movie_name in movie_name_list:
-                self.Ipca_Train_Reduce(movie_name)
+                self.Ipca_Train_Reduce(movie_name,to_reduce_data=False)
 
     def Data_To_Feature(self, movie_name_list =None,):
 
@@ -181,32 +183,31 @@ class VECTORS_REDUCE():
             # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
             print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
 
-
             data_list = [list(one_dict.values())[:-2] for one_dict in cursor_dict]
             target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
             print("len(dict_list) =", len(data_list),
                   "len(dict_list[-1] =", len(data_list[-1]),
-                  "target_list[-1][-3:]",target_list[-3:]
+                  "target_list[-3:]",target_list[-3:]
                   )
 
             # To Train
+            if not to_reduce_data:
+                if self.to_train:
+                    # train ipca chunk by chunk
+                    self.Ipca.partial_fit(dict_list)
 
-            # if self.to_train:
-            #     # train ipca chunk by chunk
-            #     self.Ipca.partial_fit(dict_list)
-            #
-            #     if i % 100 == 0 and self.reset_pca:
-            #
-            #         with open(self._model_path, 'wb') as file_id:
-            #             pickle.dump(self.Ipca, file_id)
+                    if i % 100 == 0 and self.reset_pca:
 
-            # to reduce data
-            # if to_reduce_data:
-            #     ipcaed_vector = self.Ipca_loaded.transform(dict_list)
-            #     target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
-            #     # todo_1
-            #     # insert reduced data to reduced database
-            #     self.data_base_reduced.insert_data(ipcaed_vector, target_list)
+                        with open(self._model_path, 'wb') as file_id:
+                            pickle.dump(self.Ipca, file_id)
+
+            # To Reduce Data
+            if to_reduce_data:
+                ipcaed_vector = self.Ipca_loaded.transform(data_list)
+                # target_list = [list(one_dict.values())[-2:] for one_dict in cursor_dict]
+                # todo_1
+                # insert reduced data to reduced database
+                self.data_base_reduced.insert_data(ipcaed_vector, target_list)
 
             i += 1  # increase while
 
@@ -231,6 +232,7 @@ if __name__ == "__main__":
                            data_base_reduced =data_base_reduced,
                            # folder_containing_movies="/data/bar03",
                            movie_name_list=[3])
+
     # print(train_ipca._Get_Moive_Name_From_Folder())
     # print(train_ipca.movie_name_list)
 
