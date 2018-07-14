@@ -1,5 +1,4 @@
 import time
-
 from database import DATABASE
 import pymongo
 
@@ -33,13 +32,12 @@ def idlimit(movie_name, page_size, last_id=None):
     cursor_dict = list(cursor)
     cursor.close()
 
-    length_of_chunk  =     len(cursor_dict)
+    length_of_chunk = len(cursor_dict)
     print("len(cursor_dict)) =", length_of_chunk)
-
     # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
 
     print("   read data time = {}  ".format(time.time() - t0).center(60, "*"))
-
+    print(" length of cursor = {}".format(len(cursor_dict)).center(40,"$"))
     if len(cursor_dict) < 150:
         print("len(cursor_dict) < 150:")
         return None, None, None
@@ -71,7 +69,6 @@ last_id = None
 i = 0
 
 
-
 while True:
     print("  once chunk_time  ".center(90, "="))
 
@@ -80,10 +77,9 @@ while True:
     # todo 1  what data you want
     t0 = time.time()
     if last_id is None:
-        print("here")
+        # print("here")
         break
-    print("  limit_fun reture time = {}  ".format(time.time() - t0).center(50,"*"))
-
+    print(" limit_fun reture time = {}  ".format(time.time() - t0).center(50,"*"))
 
 
 # while True:
