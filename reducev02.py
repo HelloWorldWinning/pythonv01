@@ -176,6 +176,8 @@ class VECTORS_REDUCE():
                 break
             t0 = time.time()
             cursor_dict = list(cursor)
+            cursor.close()
+
             # dict_list = [list(one_dict.values()) for one_dict in cursor_dict]
             print("   read data time = {} ".format(time.time()-t0).center(60,"*"))
 
@@ -228,7 +230,7 @@ if __name__ == "__main__":
     train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
                            data_base_reduced =data_base_reduced,
                            # folder_containing_movies="/data/bar03",
-                           movie_name_list=[0])
+                           movie_name_list=[3])
     # print(train_ipca._Get_Moive_Name_From_Folder())
     # print(train_ipca.movie_name_list)
 
