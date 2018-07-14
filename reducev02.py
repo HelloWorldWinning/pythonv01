@@ -261,11 +261,11 @@ if __name__ == "__main__":
     print(data_base_of_raw_data.collections_of_eachdatabase)
 
     train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
-                           data_base_reduced =data_base_reduced,
+                           data_base_reduced = data_base_reduced,
                            # folder_containing_movies="/data/bar03",
-                           movie_name_list=[3],
-                           ipca_model_path="/data/bar03/ipcav06.pkl",
-                           reset_pca= True
+                           movie_name_list = [3],
+                           ipca_model_path ="/data/bar03/ipcav06.pkl",
+                           reset_pca = True
 
                                 )
 
