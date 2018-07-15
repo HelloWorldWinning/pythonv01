@@ -56,11 +56,16 @@ if __name__ == "__main__":
     print("  old version  ".center(100,"="))
     for i in data_base.collections_of_eachdatabase:
         pprint(i)
+
     # data_base.database_chose("bar")
     # data_base.collection_chose("raw_vector01")
+
+
     data_base.database_chose("bar")
-    data_base.collection_chose("raw_vector01")
-    print(data_base.collection.find().count())
+    data_base.collection_chose("raw_vector01_redu")
+
+
+    # print(data_base.collection.find().count())
     # print(data_base.get_data( limit=10))
 
     # co.database_chose("bar2")
@@ -106,8 +111,10 @@ if __name__ == "__main__":
     # print(data_list_from_db.shape)
 
     from sklearn.decomposition import IncrementalPCA as IPCA
+
     print( "  getting data ".center(100,"!"))
     d = data_base
+
     # d = data_base.collection.find({"movie_name": "$exists" } )
     # d = data_base.collection.find({"movie_name":  0 }  , {  "movie_name":True ,"_id": False}).limit(10)
     # # print( [ i for i in d])
@@ -115,7 +122,7 @@ if __name__ == "__main__":
     # out = [i for i in d.collection.find({"movie_name": {"$exists": True}}, {"movie_name":, "_id": False})]
     # out = [i for i in d.collection.find({}, {"movie_name":{"$slice":[-20,1]}, "movie_name":True , "_id": False})]
     # out = [i for i in d.collection.find({}, {"movie_name":True, "_id": False})[30000:30000+5]]
-    out =d.get_data(movie_name=6,limit=2)
+    out =d.get_data(movie_name=0,limit=2)
     print("are you ok")
     # print(len(out))
     print(out)

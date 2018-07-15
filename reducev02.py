@@ -143,7 +143,7 @@ class VECTORS_REDUCE():
             for movie_name in movie_name_list:
                 self.Ipca_Train_Reduce(movie_name,to_reduce_data=False)
 
-    def Data_To_Feature(self, movie_name_list =None,):
+    def Data_To_Feature(self, movie_name_list =None):
 
         if movie_name_list is None:
             for movie_name in self.movie_name_list:
@@ -276,14 +276,20 @@ if __name__ == "__main__":
     print(train_ipca.movie_name_list)
     print(DATABASE().collections_of_eachdatabase)
 
-    train_ipca.Movie_To_Train_Ipca()
+    # train_ipca.Movie_To_Train_Ipca()
 
     # print(train_ipca._Get_Moive_Name_From_Folder())
     # print(train_ipca.movie_name_list)
     # train_ipca.Movie_To_Train_Ipca()
-    # print("$"*100)
-    # train_ipca.Ipca_Reduced_Model_Load()
-    # train_ipca.Data_To_Feature()
+
+    print("$"*100)
+
+
+
+    train_ipca.Ipca_Reduced_Model_Load()
+    train_ipca.Data_To_Feature()
+
+
 
     # vector_to_feature = VECTORS_REDUCE(  data_base_of_raw_data = data_base_of_raw_data,
     #                        data_base_reduced =data_base_reduced,
