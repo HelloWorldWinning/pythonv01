@@ -210,9 +210,8 @@ class VECTORS_REDUCE():
                       .format(len(data_list), len(data_list[-1]), len(target_list)))
                 self.Ipca.partial_fit(data_list)
 
-                # if i % 3 == 0 and self.reset_pca:
-
-                if True:
+                if i % 111 == 0 and self.reset_pca:
+                # if True:
                     with open(self._model_path, 'wb') as file_id:
                         pickle.dump(self.Ipca, file_id)
 
@@ -252,7 +251,6 @@ class VECTORS_REDUCE():
         # test_data_ipcad_loaded = IPCA.transform(test_data)
 
 
-
 if __name__ == "__main__":
 
     data_base_of_raw_data = DATABASE()
@@ -268,8 +266,8 @@ if __name__ == "__main__":
 
     train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
                                 data_base_reduced = data_base_reduced,
-                                # folder_containing_movies="/data/bar03",
-                                movie_name_list = [3,4],
+                                folder_containing_movies="/data/bar03",
+                                # movie_name_list = [3,4],
                                 ipca_model_path ="/data/bar03/ipcav08.pkl",
                                 reset_pca = True
                                 )
