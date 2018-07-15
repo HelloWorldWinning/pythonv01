@@ -171,14 +171,16 @@ class MODEL_JPG_VECTOR(object):
 
 
 
-# folder_path = "/data/bar03/output"
+if __name__ == "__main__":
+    # folder_path = "/data/bar03/output"
 
-# bar = MODEL_JPG_VECTOR(folder_path=folder_path)
+    # bar = MODEL_JPG_VECTOR(folder_path=folder_path)
 
-# ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
-# one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-2])
+    # ten_jpg = bar.Jpg_To_Vector_DataBase(to_database=False)
+    # one_jpg = bar.Jpg_To_Vector(bar.img_path_many[-2])
 
 
-# one_jpg_1 = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
-# print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(1)  )
-# print( ( one_jpg.flatten() ==ten_jpg[-1].flatten() ).all() )
+    # one_jpg_1 = bar.Jpg_To_Vector_DataBase(img_path_many=bar.img_path_many[-1],to_database=True)
+    # print(  "print( ( one_jpg.flatten() == one_jpg_1.flatten() ).all() )".center(1)  )
+    # print( ( one_jpg.flatten() ==ten_jpg[-1].flatten() ).all() )
+    pass
