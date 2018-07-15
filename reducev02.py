@@ -5,6 +5,7 @@ from database import DATABASE
 import numpy as np
 import pymongo
 
+
 class VECTORS_REDUCE():
 
     def __init__(self, data_base_of_raw_data =None, data_base_reduced =None,
@@ -159,6 +160,7 @@ class VECTORS_REDUCE():
 
         i = 0
         while True:
+
             print("  once chunk_time  ".center(90, "="))
 
             left = i * chunk_time
@@ -166,7 +168,7 @@ class VECTORS_REDUCE():
 
             # todo 1  what data you want
 
-            cursor = data_base.collection.find (
+            cursor = data_base.collection.find(
                 {"movie_name": movie_name, "second": {"$gte": left, "$lt": right}},
                 {"_id": False},  # "second": True,
                 batch_size = 1000,
@@ -208,8 +210,9 @@ class VECTORS_REDUCE():
                       .format(len(data_list), len(data_list[-1]), len(target_list)))
                 self.Ipca.partial_fit(data_list)
 
-                if i % 10 == 0 and self.reset_pca:
+                # if i % 3 == 0 and self.reset_pca:
 
+                if True:
                     with open(self._model_path, 'wb') as file_id:
                         pickle.dump(self.Ipca, file_id)
 
@@ -221,7 +224,7 @@ class VECTORS_REDUCE():
 
                 # To Reduce Data
                 ipcaed_vector = self.Ipca_Loaded.transform(data_list)
-                self.ipcaed_vector  =  ipcaed_vector
+                self.ipcaed_vector = ipcaed_vector
                 print(" to predict data, data length is = {} ,data dimension is = {}, target length = {}"
                       .format(len(ipcaed_vector), len(ipcaed_vector[-1]), len(target_list)))
 
@@ -229,14 +232,15 @@ class VECTORS_REDUCE():
                 # todo_1
                 # insert reduced data to reduced database
 
-
                 # Insert Reduced data to database
                 # self.data_base_reduced.insert_data(ipcaed_vector, target_list)
                 self.data_base_reduced.insert_data(ipcaed_vector, target_list)
 
             i += 1  # increase while
 
+
     def Ipca_Reduced_Model_Load(self, model_path =None):
+
         if model_path is None:
             with open(self._model_path, 'rb') as file_id:
                 Ipca_loaded = pickle.load(file_id)
@@ -248,6 +252,7 @@ class VECTORS_REDUCE():
         # test_data_ipcad_loaded = IPCA.transform(test_data)
 
 
+
 if __name__ == "__main__":
 
     data_base_of_raw_data = DATABASE()
@@ -257,27 +262,30 @@ if __name__ == "__main__":
     data_base_reduced = DATABASE()
     data_base_reduced.database_chose("bar")
     data_base_reduced.collection_chose("raw_vector01_redu")
+    # data_base_reduced.collection.drop()
 
     print(data_base_of_raw_data.collections_of_eachdatabase)
 
     train_ipca = VECTORS_REDUCE(data_base_of_raw_data = data_base_of_raw_data,
-                           data_base_reduced = data_base_reduced,
-                           # folder_containing_movies="/data/bar03",
-                           movie_name_list = [3],
-                           ipca_model_path ="/data/bar03/ipcav06.pkl",
-                           reset_pca = True
+                                data_base_reduced = data_base_reduced,
+                                # folder_containing_movies="/data/bar03",
+                                movie_name_list = [3,4],
+                                ipca_model_path ="/data/bar03/ipcav08.pkl",
+                                reset_pca = True
                                 )
+
+    print(train_ipca._model_path)
+    print(train_ipca.movie_name_list)
+    print(DATABASE().collections_of_eachdatabase)
+
+    train_ipca.Movie_To_Train_Ipca()
 
     # print(train_ipca._Get_Moive_Name_From_Folder())
     # print(train_ipca.movie_name_list)
-
     # train_ipca.Movie_To_Train_Ipca()
-    #
     # print("$"*100)
-    train_ipca.Ipca_Reduced_Model_Load()
-    train_ipca.Data_To_Feature()
-
-
+    # train_ipca.Ipca_Reduced_Model_Load()
+    # train_ipca.Data_To_Feature()
 
     # vector_to_feature = VECTORS_REDUCE(  data_base_of_raw_data = data_base_of_raw_data,
     #                        data_base_reduced =data_base_reduced,
