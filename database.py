@@ -26,11 +26,11 @@ class DATABASE():
 
     def get_data(self, movie_name_field="movie_name", movie_name=None, limit = None,numpy_data=True, *args, **kwargs):
         if movie_name is None:
-            query_str = {"$lte": 10000}
+            query_str = {"$lte": 1000000}
         else:
             query_str = movie_name
 
-        if limit == None:
+        if limit is None:
             cursor = self.collection.find({movie_name_field: query_str}, {"_id": False})
         else:
             cursor = self.collection.find({movie_name_field: query_str}, {"_id": False}).limit(limit)
@@ -49,6 +49,7 @@ class DATABASE():
         return insert_result
 
 if __name__ == "__main__":
+
     from pprint import pprint
 
     data_base = DATABASE()
