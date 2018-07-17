@@ -9,7 +9,7 @@ bar.collection_chose("raw_vector01_redu")
 
 print(bar.collection.count())
 
-
+print(DATABASE)
 
 # while True:
 #     print(  bar.collection.count() )
