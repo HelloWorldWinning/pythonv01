@@ -1,3 +1,5 @@
+import time
+
 import os
 from database import DATABASE
 import subprocess
@@ -145,8 +147,10 @@ class MATCH():
         xq = reduced_data.astype("float32")
         xq[:, 0] += np.arange(nq) / 1000.
         k = 1                            # we want to see 4 nearest neighbors
+        t0 = time.time()
         D, I = self.data_base_index.search(xq, k)       # sanity check
-
+        t1 = time.time()
+        print("Query time is  ={} ".format(t1-t0))
         # print(I)
         # print(D)
         # print(compare_target[ [i for i in I.flatten()] ] )
