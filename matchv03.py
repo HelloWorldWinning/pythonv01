@@ -9,7 +9,6 @@ from keras.preprocessing import image
 from keras.applications.xception import Xception as key_model
 from keras.applications.xception import preprocess_input, decode_predictions
 
-
 base_model_4 = key_model(weights='imagenet', include_top=False)
 model = Model(inputs=base_model_4.input, outputs=base_model_4.get_layer(index=-3).output)
 
@@ -43,6 +42,9 @@ class MATCH():
         lines = file.read().split()
         file.close()
         self.index_to_name = lines
+        self._Query_Index_Builder()
+
+        del self.compare_data
 
 
     def _Img_List(self,folder_path_input=None):
@@ -113,27 +115,37 @@ class MATCH():
         # match.compare_target
         # match.compare_data
 
-    def Query_Name_Time(self):
+    def _Query_Index_Builder(self):
 
         d = 160                               # dimension
-
         nb = self.compare_target.shape[0]     # database size
-        nq = 2                                # nb of queries
+        # nq = 2                                # nb of queries
 
         xb = self.compare_data.astype("float32")
         xb[:, 0] += np.arange(nb) / 1000.
 
-        xq = self.Many_Query_Data().astype("float32")
+        # xq = self.Many_Query_Data().astype("float32")
+        # xq[:, 0] += np.arange(nq) / 1000.
+
+        # index = faiss.IndexFlatL2(d)   # build the index
+        self.data_base_index = faiss.IndexFlatL2(d)
+        print(self.data_base_index.is_trained)
+
+        self.data_base_index.add(np.ascontiguousarray(xb))                  # add vectors to the index
+
+        print(self.data_base_index.ntotal)
+
+
+    def Queury_Name_Time(self, folder_containing_imgs):
+
+        img_path_many = self._Img_List(folder_containing_imgs)
+        reduced_data = self.Many_Query_Data(img_path_many)
+
+        nq = len(reduced_data)                           # nb of queries
+        xq = reduced_data.astype("float32")
         xq[:, 0] += np.arange(nq) / 1000.
-
-        index = faiss.IndexFlatL2(d)   # build the index
-
-        print(index.is_trained)
-        index.add(np.ascontiguousarray(xb))                  # add vectors to the index
-        print(index.ntotal)
-
         k = 1                            # we want to see 4 nearest neighbors
-        D, I = index.search(xq, k)       # sanity check
+        D, I = self.data_base_index.search(xq, k)       # sanity check
 
         # print(I)
         # print(D)
@@ -146,16 +158,16 @@ class MATCH():
         movie_names_list = [self.index_to_name[int(i)] for i in movie_name_index]
 
         movie_time_index = self.compare_target[:,1][ [i for i in I.flatten()] ].tolist()
+
         print(movie_names_list)
         print(movie_time_index)
-        return movie_names_list,movie_time_index
-
+        return movie_names_list, movie_time_index
 
 
 match =MATCH()
-match.Query_Name_Time()
 
-
+folder = "/data/bar03/screenshot01"
+match.Queury_Name_Time(folder)
 
 
 
