@@ -177,56 +177,6 @@ match.Queury_Name_Time(folder)
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 # very high effiency model
 
 # d = 160                               # dimension
