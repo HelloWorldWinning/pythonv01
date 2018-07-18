@@ -15,17 +15,19 @@ model = Model(inputs=base_model_4.input, outputs=base_model_4.get_layer(index=-3
 
 class MATCH():
 
+
     def __init__(self,
                  reduced_database_source = "bar",
                  reduced_collection_source = "raw_vector01_redu",
                  folder_contains_imgs = "/data/bar03/screenshot01/",
-                 traind_ipca_model_path = "/data/bar03/ipcav08.pkl"
+                 traind_ipca_model_path = "/data/bar03/ipcav08.pkl",
+                 index_to_name_file = "/data/bar03/moive_name_list_new.txt"
                  ):
 
         reduced_database = DATABASE()
         reduced_database.database_chose(reduced_database_source)
         reduced_database.collection_chose(reduced_collection_source)
-        data_from_database = reduced_database.get_data(movie_name=0).astype("float32")
+        data_from_database = reduced_database.get_data().astype("float32")
 
         self.compare_data = data_from_database[:, :-2]
         self.compare_target = data_from_database[:, -2:]
@@ -36,6 +38,12 @@ class MATCH():
         with open(self.model_path_ipca, 'rb') as file_id:
             self._Ipca_loaded = pickle.load(file_id)
 
+        file = open(index_to_name_file, "r")
+        # And for reading use
+        lines = file.read().split()
+        file.close()
+        self.index_to_name = lines
+
 
     def _Img_List(self,folder_path_input=None):
 
@@ -43,6 +51,7 @@ class MATCH():
             folder_path = self.folder_contains_imgs
         else:
             folder_path = folder_path_input
+
         movies_jpgs = subprocess.check_output(["ls", folder_path]).decode("utf-8").split("\n")
         movies_jpgs = [os.path.join(folder_path, i) for i in movies_jpgs if i.endswith(".jpg")]
         print("movies_jpgs =", movies_jpgs)
@@ -51,6 +60,7 @@ class MATCH():
             img_path_many = [img_path_many]
 
         return img_path_many
+
 
     def Many_Query_Data(self, img_path_many_input= None):
         if img_path_many_input is None:
@@ -82,7 +92,6 @@ class MATCH():
         # model_path = self.model_path_ipca
 
         reduced_data = self._Ipca_loaded.transform(data)
-
         return reduced_data
 
 
@@ -100,6 +109,102 @@ class MATCH():
         reduced_data = self._Ipca_loaded.transform(a6_data)
         return reduced_data
 
+        # match = MATCH()
+        # match.compare_target
+        # match.compare_data
+
+    def Query_Name_Time(self):
+
+        d = 160                               # dimension
+
+        nb = self.compare_target.shape[0]     # database size
+        nq = 2                                # nb of queries
+
+        xb = self.compare_data.astype("float32")
+        xb[:, 0] += np.arange(nb) / 1000.
+
+        xq = self.Many_Query_Data().astype("float32")
+        xq[:, 0] += np.arange(nq) / 1000.
+
+        index = faiss.IndexFlatL2(d)   # build the index
+
+        print(index.is_trained)
+        index.add(np.ascontiguousarray(xb))                  # add vectors to the index
+        print(index.ntotal)
+
+        k = 1                            # we want to see 4 nearest neighbors
+        D, I = index.search(xq, k)       # sanity check
+
+        # print(I)
+        # print(D)
+        # print(compare_target[ [i for i in I.flatten()] ] )
+
+        print("$"*80)
+        print(self.compare_target[ [i for i in I.flatten()] ])
+
+        movie_name_index = self.compare_target[:,0][ [i for i in I.flatten()] ]
+        movie_names_list = [self.index_to_name[int(i)] for i in movie_name_index]
+
+        movie_time_index = self.compare_target[:,1][ [i for i in I.flatten()] ].tolist()
+        print(movie_names_list)
+        print(movie_time_index)
+        return movie_names_list,movie_time_index
+
+
+
+match =MATCH()
+match.Query_Name_Time()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -111,14 +216,16 @@ class MATCH():
 
 
 # very high effiency model
+
+# d = 160                               # dimension
+# nb = match.compare_target.shape[0]    # database size
+# nq = 1                                # nb of queries
+# # np.random.seed(1234)                # make reproducible
 #
-# d = 160                           # dimension
-# nb = compare_target.shape[0]        # database size
-# nq = 1                             # nb of queries
-# # np.random.seed(1234)             # make reproducible
-# xb = compare_data
+# xb = match.compare_data.astype("float32")
 # xb[:, 0] += np.arange(nb) / 1000.
-# xq = reduced_data.astype("float32")
+#
+# xq = match.Many_Query_Data().astype("float32")
 # xq[:, 0] += np.arange(nq) / 1000.
 #
 # index = faiss.IndexFlatL2(d)   # build the index
@@ -126,18 +233,16 @@ class MATCH():
 # index.add(np.ascontiguousarray(xb))                  # add vectors to the index
 # print(index.ntotal)
 #
+# k = 2                            # we want to see 4 nearest neighbors
+# D, I = index.search(xq, k)       # sanity check
 #
-# k = 3                          # we want to see 4 nearest neighbors
-# D, I = index.search(xq, k)     # sanity check
-# print(I)
-# print(D)
-# print(compare_target[ [i for i in I.flatten()] ] )
+# # print(I)
+# # print(D)
+# # print(compare_target[ [i for i in I.flatten()] ] )
 #
+# print("$"*80)
+# print(match.compare_target[ [i for i in I.flatten()] ])
 #
+# movie_name_index =  match.compare_target[:,0][ [i for i in I.flatten()] ]
 #
-#
-#
-#
-#
-#
-
+# [lines[int(i)] for i in movie_name_index]
