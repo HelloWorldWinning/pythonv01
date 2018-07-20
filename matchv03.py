@@ -156,7 +156,10 @@ class MATCH():
         # print(compare_target[ [i for i in I.flatten()] ] )
 
         print("$"*80)
-        print(self.compare_target[ [i for i in I.flatten()] ])
+        # print(self.compare_target[ [i for i in I.flatten()] ])
+
+        print( "len(self.compare_target)   =", len(self.compare_target) )
+
 
         movie_name_index = self.compare_target[:,0][ [i for i in I.flatten()] ]
         movie_names_list = [self.index_to_name[int(i)] for i in movie_name_index]
@@ -172,12 +175,6 @@ match =MATCH()
 
 folder = "/data/bar03/screenshot01"
 match.Queury_Name_Time(folder)
-
-
-
-
-
-
 
 
 
